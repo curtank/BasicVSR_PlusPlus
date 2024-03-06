@@ -109,13 +109,22 @@ def run_to_img(model,src_file,output_dir,filename_tmpl,device):
 def img2img(model,input_dir,output_dir,filename_tmpl,device):
     images = []
     image_names = []
+    batch_size = None
     for filename in sorted(os.listdir(input_dir)):
         if filename.endswith('.png'):
             img = mmcv.imread(os.path.join(input_dir, filename))
             img = np.flip(img, axis=2)
+            # get shape
+            if batch_size is None:
+                shape = img.shape
+                print(shape)
+                batch_size = (1024*1024*2) / (shape[0] * shape[1])
+                print(batch_size)
+                batch_size = int(round(batch_size))
+                print(batch_size)
             images.append(img)
             image_names.append(filename)
-            print(filename)
+            # print(filename)
     inputs = [
         torch.from_numpy(image / 255.0).permute(2, 0, 1).float().unsqueeze(0)
         for image in images
@@ -123,7 +132,7 @@ def img2img(model,input_dir,output_dir,filename_tmpl,device):
     stack = torch.stack(inputs, dim=1)
     image_name_index = 0
     with torch.no_grad():
-        batch_size = 5
+        # batch_size = 1
         for i in tqdm(range(0, stack.size(1), batch_size)):
             data = stack[:, i:i+batch_size, :, :, :].to(device)
             result = model(data, test_mode=True)["output"].cpu()

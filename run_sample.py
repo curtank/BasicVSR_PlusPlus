@@ -28,10 +28,17 @@ def run_multi_sample(device_num, sample_list, input_path):
 def main():
     device_num = [0,1,2]
     # device_num = [0]
+    # device_num = [2]
     sample_dist = '/mnt/weka/scratch/qingyu.sui/sample'
     sample_list = [
-        x for x in os.listdir(sample_dist) if os.path.isdir(os.path.join(sample_dist, x))
+        'SLAM_DUNK', 
+        'Friends', 
+        'Gone_with_the_Wind', 
+        '12_Angry_Men', 
+        'Evangelion', 
+        'The_Godfather'
     ]
+
     print(sample_list)
 
     pool = Pool(len(device_num))
